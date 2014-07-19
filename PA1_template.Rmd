@@ -2,11 +2,22 @@
 #### Igor Protsenko, Jul 19th, 2014
 ========================================
 
+```{r echo=FALSE}
+library(knitr)
+```
+
 ### Loading and preprocessing the data
 
-add content here
-1. q1
-2. q2
+Loading data from `activity.zip` file
+
+```{r}
+unzip("activity.zip")
+data <- read.csv("activity.csv")
+head(data)
+```
+
+Processing data into format suitable for analysis
+
 
 ### What is mean total number of steps taken per day?
 
