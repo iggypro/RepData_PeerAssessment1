@@ -154,8 +154,7 @@ temp <- data.frame(rowsNA,data[which(is.na(data$steps)),"interval"])
 names(temp) <- c("rowsNA","interval")
 temp <- merge(temp,meansNA,by="interval")
 newdata[rowsNA,"steps"] <- temp[which(temp$rowsNA==rowsNA),"steps"]
-#head(data)
-#head(newdata)
+# summary of original data with NA's
 summary(data)
 ```
 
@@ -171,6 +170,7 @@ summary(data)
 ```
 
 ```r
+# summary of new data without NA's (NA's filled in with means for the interval)
 summary(newdata)
 ```
 
@@ -185,7 +185,7 @@ summary(newdata)
 ##                  (Other)   :15840
 ```
 
-* Make a histogram
+* Making side-by-side histograms to compare two datasets
 
 
 ```r
@@ -245,3 +245,22 @@ summary(newdata)
 * Creating a panel plot with average steps per interval averaged across weekday/weekend
 
 
+```r
+# preparing data for plotting
+weekday <- aggregate(steps~interval,data=newdata,mean,subset=newdata$ww=="weekday",na.rm=T)
+weekend <- aggregate(steps~interval,data=newdata,mean,subset=newdata$ww=="weekend",na.rm=T)
+# plotting two panels side-by-side
+par(mfrow=c(1,2))
+#plotting "weekday" time series
+plot(weekday$interval,weekday$steps,type="l",
+     main = "Weekday: Average Steps per Interval",
+     xlab = "Intervals",
+     ylab = "Steps")
+#plotting "weekend" time series
+plot(weekend$interval,weekend$steps,type="l",
+     main = "Weekend: Average Steps per Interval",
+     xlab = "Intervals",
+     ylab = "Steps")
+```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12.png) 

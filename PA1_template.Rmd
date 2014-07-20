@@ -94,9 +94,9 @@ summary(data)
 summary(newdata)
 ```
 
-* Make a histogram
+* Making side-by-side histograms to compare two datasets
 
-```{r}
+```{r fig.width=11}
 # aggregating data by date
 tempOld <- aggregate(steps~date,data=data,sum,na.rm=T)
 tempNew <- aggregate(steps~date,data=newdata,sum,na.rm=T)
@@ -127,6 +127,20 @@ summary(newdata)
 
 * Creating a panel plot with average steps per interval averaged across weekday/weekend
 
-```{r}
-
+```{r fig.width=11}
+# preparing data for plotting
+weekday <- aggregate(steps~interval,data=newdata,mean,subset=newdata$ww=="weekday",na.rm=T)
+weekend <- aggregate(steps~interval,data=newdata,mean,subset=newdata$ww=="weekend",na.rm=T)
+# plotting two panels side-by-side
+par(mfrow=c(1,2))
+#plotting "weekday" time series
+plot(weekday$interval,weekday$steps,type="l",
+     main = "Weekday: Average Steps per Interval",
+     xlab = "Intervals",
+     ylab = "Steps")
+#plotting "weekend" time series
+plot(weekend$interval,weekend$steps,type="l",
+     main = "Weekend: Average Steps per Interval",
+     xlab = "Intervals",
+     ylab = "Steps")
 ```
