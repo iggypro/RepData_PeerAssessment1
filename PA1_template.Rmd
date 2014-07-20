@@ -84,10 +84,14 @@ head(meansNA)
 ```{r}
 newdata <- data
 # substituting NA's for Means for the interval
-newdata[rowsNA,"steps"] <- 
-  meansNA[which(newdata[rowsNA,"interval"]==meansNA[,"interval"]),"steps"]
-head(data)
-head(newdata)
+temp <- data.frame(rowsNA,data[which(is.na(data$steps)),"interval"])
+names(temp) <- c("rowsNA","interval")
+temp <- merge(temp,meansNA,by="interval")
+newdata[rowsNA,"steps"] <- temp[which(temp$rowsNA==rowsNA),"steps"]
+# summary of original data with NA's
+summary(data)
+# summary of new data without NA's (NA's filled in with means for the interval)
+summary(newdata)
 ```
 
 * Make a histogram
@@ -107,6 +111,22 @@ cat("Mean (NA=Yes):",mean(tempOld$steps),"\n","Median (NA=Yes):",median(tempOld$
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
-add content here
-1.
-2.
+* Creating a new Weekday/Weekend factor variable
+
+```{r}
+# creating new variable
+newdata$ww <- weekdays(as.Date(newdata$date))
+# changing factor levels to weekday/weekend
+newdata[which(
+        newdata$ww %in% c("Monday","Tuesday","Wednesday","Thursday","Friday")
+              ),"ww"] <- "weekday"
+newdata[which(newdata$ww!="weekday"),"ww"] <- "weekend"
+newdata$ww <- as.factor(newdata$ww)
+summary(newdata)
+```
+
+* Creating a panel plot with average steps per interval averaged across weekday/weekend
+
+```{r}
+
+```
