@@ -8,36 +8,102 @@ library(knitr)
 
 ### Loading and preprocessing the data
 
-Loading data from `activity.zip` file
+* Loading data from `activity.zip` file
 
 ```{r}
 unzip("activity.zip")
 data <- read.csv("activity.csv")
-head(data)
+summary(data)
 ```
 
-Processing data into format suitable for analysis
+* Processing data into format suitable for analysis
 
 
 ### What is mean total number of steps taken per day?
 
-add content here
-1.
-2.
+* Making a histogram of the total number of steps taken each day
+
+```{r}
+# aggregating data by date
+temp <- aggregate(steps~date,data=data,sum,na.rm=T)
+# plotting a histogram
+hist(temp$steps, main = "Distribution of Daily Steps", xlab = "Steps")
+```
+
+* Calculating **mean** and **median** total number of steps taken per day
+
+```{r}
+cat("Mean:",mean(temp$steps),"\n","Median:",median(temp$steps))
+```
 
 ### What is the average daily activity pattern?
 
-add content here
-1.
-2.
+* Making a time series plot of average steps taken per 5-minute interval across days
+
+```{r}
+# aggregating data by date
+temp <- aggregate(steps~interval,data=data,mean,na.rm=T)
+#plotting time series
+plot(temp$interval,temp$steps,type="l",
+     main = "Average Steps per Interval across Days",
+     xlab = "Intervals",
+     ylab = "Steps")
+```
+
+* Calculating, which 5-minute interval, on average across days, contains maximum number of steps
+
+```{r}
+# returning an observation with maximum number of steps
+temp[which(temp$steps==max(temp$steps)),]
+```
 
 ### Imputting missing values
 
-add content here
-1.
-2.
-3.
-4.
+* Calculating total number of rows wih NA's in the dataset
+
+```{r}
+# calculating and printing number of rows with NA's
+cat("Number of rows with NA's:",length(which(rowSums(is.na(data)) > 0)))
+# printing summary of a subset consisiting of NA rows
+summary(data[rowSums(is.na(data)) > 0, ])
+```
+
+* NA Removal Strategy: substitute NA's with Means for that interval
+
+```{r}
+# getting row numbers with NA's
+rowsNA <- which(is.na(data$steps))
+head(rowsNA)
+# calculating Means for each interval across days to use as NA substitute
+meansNA <- aggregate(steps~interval,data=data,mean,na.rm=T)
+head(meansNA)
+```
+
+* Creating a new dataset with NA's filled in with Means for the interval
+
+```{r}
+newdata <- data
+# substituting NA's for Means for the interval
+newdata[rowsNA,"steps"] <- 
+  meansNA[which(newdata[rowsNA,"interval"]==meansNA[,"interval"]),"steps"]
+head(data)
+head(newdata)
+```
+
+* Make a histogram
+
+```{r}
+# aggregating data by date
+tempOld <- aggregate(steps~date,data=data,sum,na.rm=T)
+tempNew <- aggregate(steps~date,data=newdata,sum,na.rm=T)
+# plotting two histograms side-by-side
+par(mfrow=c(1,2))
+hist(tempOld$steps, main = "Daily Steps (data with NA's)", xlab = "Steps")
+hist(tempNew$steps, main = "Daily Steps (data without NA's)", xlab = "Steps")
+# calculating Mean and Median for old and new datasets
+cat("Mean (NA=Yes):",mean(tempOld$steps),"\n","Median (NA=Yes):",median(tempOld$steps),"\n\n",
+    "Mean (NA=No):",mean(tempNew$steps),"\n","Median (NA=No):",median(tempNew$steps))
+```
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
